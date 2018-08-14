@@ -10,9 +10,9 @@ app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
 
-# @app.route('/')
-# def index():
-#     return render_template('test.html')
+@app.route('/feedpage')
+def feedpage():
+    return render_template('feedpage.html')
 
 # Serverside event handler on an unnamed event
 # Namespace is to allow multiplex connections
