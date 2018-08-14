@@ -21,7 +21,7 @@ socketio = SocketIO(app)
 
 @socketio.on('update', namespace='/test')
 def send_message(message):
-    emit('response', {'data': message['data']}, broadcast=True)
+    emit('response', {'value': message['value']}, broadcast=True)
 
 
 if __name__ == '__main__':
