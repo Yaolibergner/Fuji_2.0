@@ -22,6 +22,7 @@ def feedpage():
 @socketio.on('update', namespace='/test')
 def send_message(message):
     emit('response', {'value': message['value']}, broadcast=True)
+    # need to add message to database. 
 
 
 if __name__ == '__main__':

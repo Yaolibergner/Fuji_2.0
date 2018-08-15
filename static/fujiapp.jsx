@@ -1,9 +1,31 @@
 "use strict";
 
-// Does this go globally?
+// Does this usually go globally?
 let socket = io.connect('http://' + 'localhost:5000' + '/test');
 
- // MessageArea component that's a child of Fujiapp root component 
+// FujiApp root component.
+class FujiApp extends React.Component {
+  render() {
+    return (
+      <div className="feedpage">
+              <Welcome />
+              <Feed />
+              <MessageArea />
+      </div>
+    );
+  };
+}
+
+// A welcome title.
+class Welcome extends React.Component {
+  render() {
+    return (
+      <h3 className="Wecome-title">Welcome to Fuji.</h3>
+      );
+ };
+}
+
+// MessageArea component that's a child of FujiApp root component 
 class MessageArea extends React.Component {
   constructor(props) {
     super(props);
@@ -20,7 +42,6 @@ class MessageArea extends React.Component {
   }
 
   handleSubmit(event) {
-    // Need to update here to not replace everything, but append new message.
     socket.emit('update', {value: this.state.value})
     event.preventDefault();
   }
@@ -36,10 +57,34 @@ class MessageArea extends React.Component {
   };
 }
 
+// Feed component that's a child of FujiApp root component.
+class Feed extends React.Component {
+  constructor(props) {
+    super(props);
+    // this.state need to retrieve message with AJAX call???
+    this.state = { messages: [] };
+    socket.on('response', function(message) {
+      this.setState({messages: [...this.state.messages, message['value']]});
+    }.bind(this));
+  }
 
- // render start 
+  render() {
+    let messages = this.state.messages;
+    // React for loop.
+    let messageList = messages.map(function(message){
+      return <p>{message}</p>;
+    })
+    return (
+      <div className="messages">
+        {messageList}
+      </div>
+    );
+  };
+}
+
+// render start 
 ReactDOM.render(
-  <MessageArea />,
+  <FujiApp />,
   document.getElementById('root')
 );
- // render end 
+// render end 
