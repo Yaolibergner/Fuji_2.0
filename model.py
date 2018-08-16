@@ -150,7 +150,7 @@ def example_data():
     db.session.add(message)
     db.session.commit()
 
-def connect_to_db(app, db_uri='postgresql:///fuji'):
+def connect_to_db(app, db_uri='postgresql:///fuji2'):
     """Connect the database to our Flask app."""
 
     # Configure to use our PostgreSQL database
@@ -165,6 +165,6 @@ if __name__ == "__main__": # pragma: no cover
     # leave you in a state of being able to work with the database
     # directly.
 
-    from fujiserver import app
+    from server import app
     connect_to_db(app)
     print("Connected to DB.")

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Register page{% endblock %}
+{% block content %}
+<div class="chat_window login register">
+    <div class="top_menu">
+        <div class="buttons">
+        <div class="button close"></div>
+        <div class="button minimize"></div>
+        <div class="button maximize"></div>
+    </div>
+        <div class="title">Register</div>
+    </div>
+        <form action="/register" method="POST">
+            <div class="bottom_wrapper clearfix">
+                <div class="message_input_wrapper">
+                <input class="message_input" name="email" required placeholder="Email"/>
+                </div>
+            </div>
+            <div class="bottom_wrapper clearfix">
+                <div class="message_input_wrapper">
+                <input class="message_input" name="password" required placeholder="Password"/>
+                </div> 
+            </div>
+             <div class="bottom_wrapper clearfix">
+                <div class="message_input_wrapper">
+                <input class="message_input" name="fname" required placeholder="First Name"/>
+                </div> 
+            </div>
+             <div class="bottom_wrapper clearfix">
+                <div class="message_input_wrapper">
+                <input class="message_input" name="lname" required placeholder="Last Name"/>
+                </div> 
+            </div>
+            <div class="bottom_wrapper clearfix">
+                <div class="message_input_wrapper">
+                <select class="message_input" name="language" required>
+                  {% for lang in lang_option %}                
+                  <option value="{{ lang }}">{{ lang_option[lang] }}
+                  </option>
+                  {% endfor %} 
+                </select>  
+                </div> 
+                <div class="bottom_wrapper clearfix">
+                <input type="submit">   
+              </div>
+            </div>        
+        </form>   
+    </div>
+</div>
+
+{% endblock %}
+
+
+
+
