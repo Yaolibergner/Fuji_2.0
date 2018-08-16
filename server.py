@@ -1,8 +1,13 @@
 # To initialize socketio to flask application.
 
-from flask import Flask, render_template
+from flask import Flask, session, render_template, request
+from flask import flash, redirect, url_for, g
 from flask_socketio import SocketIO
 from flask_socketio import send, emit
+from model import connect_to_db, db, User, Message, Chatroom
+from model import UserRoom, Translation
+from datetime import datetime
+from translate import translate_text
 import os
 
 app = Flask(__name__)
@@ -19,9 +24,20 @@ def feedpage():
 # Broadcast=True allows multiple clients. Which can estiblish chat between
 # each other. 
 
-@socketio.on('update', namespace='/test')
-def send_message(message):
-    emit('response', {'value': message['value']}, broadcast=True)
+# Check Flask-Socket.io authenticated_only 
+# https://flask-socketio.readthedocs.io/en/latest/.
+
+@socketio.on('update', namespace='/chat')
+def send_message(msg_evt):
+    
+    translation = translate_text('zh-CN', msg_evt['value']).translated_text
+    print("/////")
+    print(translation)
+    print("/////")
+    # Emit botht the message and the translation.
+    emit('response', {'value': msg_evt['value'], 
+                      'translation': translation}, broadcast=True)
+
     # need to add message to database. 
 
 
