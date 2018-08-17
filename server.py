@@ -120,21 +120,24 @@ def logout():
 @socketio.on('update', namespace='/chat')
 def send_message(msg_evt):
 
-    # Later, need to use session to define what translation to send back.
     translation = translate_text('zh-CN', msg_evt['value']).translated_text
-    # Emit botht the message and the translation.
-    emit('response', {'value': msg_evt['value'], 
-                      'translation': translation}, broadcast=True)
 
-    # add new message to database.
-    message = msg_evt['value']
-    author_id = g.user.user_id
+    text = msg_evt['value']
+    author_id = session['user_id']
     timestamp = datetime.now()
     chatroom_id = 1
     new_message = Message(author_id=author_id, timestamp=timestamp,
-                          text=message, chatroom_id=chatroom_id)
-
+                          text=text, chatroom_id=chatroom_id)
     db.session.add(new_message)
+    db.session.commit()
+    # Emit botht the message and the translation.
+    emit('response', {'value': msg_evt['value'],
+                      'translation': translation,
+                      'author': new_message.user.fname}, broadcast=True)
+
+    # Later, need to use session to define what translation to send back.
+
+
 
     # languages = db.session.query(User.language).distinct()
     # # Loop over all existing user distinct languages. And translate the original message

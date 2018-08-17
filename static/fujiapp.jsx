@@ -1,7 +1,7 @@
 "use strict";
 
 // Does this usually go globally?
-let socket = io.connect('http://' + 'localhost:5000' + '/chat');
+let socket = io.connect('http://' + document.domain + ':' + location.port + '/chat');
 
 // FujiApp root component.
 class FujiApp extends React.Component {
@@ -61,10 +61,13 @@ class MessageArea extends React.Component {
 class Feed extends React.Component {
   constructor(props) {
     super(props);
-    // this.state need to retrieve message with AJAX call???
+    // this.state need to retrieve message with AJAX call??? on User log in
+    // show the most recent 100 messages.
+    // also need to fetch to get user language.
     this.state = { messages: [] };
     socket.on('response', function(msg_evt) {
-      const message = {text: msg_evt['value'], 
+      const message = {author: msg_evt['author'],
+                       text: msg_evt['value'], 
                        translation: msg_evt['translation']}
       this.setState({messages: [...this.state.messages, message]});
     }.bind(this));
@@ -74,7 +77,8 @@ class Feed extends React.Component {
     let messages = this.state.messages;
     // React for loop.
     let messageList = messages.map(function(message){
-      return <p>{message.text}<br></br>{message.translation}</p>;
+      return <p>{message.author}<br></br>{message.text}<br></br>
+                {message.translation}</p>;
     })
     return (
       <div className="messages">
