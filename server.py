@@ -18,20 +18,24 @@ socketio = SocketIO(app)
 
 # Define globle user function. Call this function in the future g.user usage.
 # Memoization: to memorize the result of the query, in case the query is called
-# more then once. 
+# more then once.
+
+
 def user():
     # Check if g.user already called, then not query the database again.
     if not hasattr(g, 'user'):
         if session.get("user_id"):
             user = User.query.filter_by(user_id=session["user_id"]).first()
-        else: 
-            user = None      
-        g.user = user   
+        else:
+            user = None
+        g.user = user
     return g.user
 
-#  Add a login_required decorator. This is to protect feedpage not being showed 
+#  Add a login_required decorator. This is to protect feedpage not being showed
 #  if user not logged in.
 #  http://flask.pocoo.org/docs/1.0/patterns/viewdecorators/
+
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -40,15 +44,15 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
 @app.route('/register')
 def register_form():
     """Show form for user signup."""
 
     # A dictionary of language options with it's keys. Key as html option id
-    # dict[key] as language options. 
-    lang_option = {"en": "English", "sv": "Swedish", "zh-CN": "Chinese", 
-               "es": "Spanish", "fr": "French", "ru": "Russian"}
-
+    # dict[key] as language options.
+    lang_option = {"en": "English", "sv": "Swedish", "zh-CN": "Chinese",
+                   "es": "Spanish", "fr": "French", "ru": "Russian"}
 
     return render_template("register.html", lang_option=lang_option)
 
@@ -63,19 +67,21 @@ def add_user():
     lname = request.form.get("lname")
     language = request.form.get("language")
 
-    new_user = User(email=email, password=password,fname=fname,
-                    lname=lname,language=language)
+    new_user = User(email=email, password=password, fname=fname,
+                    lname=lname, language=language)
 
     db.session.add(new_user)
     db.session.commit()
 
     return redirect("/")
 
+
 @app.route("/")
 def loginpage():
     """Provide login form."""
 
     return render_template("loginpage.html")
+
 
 @app.route("/login", methods=['POST'])
 def logininfo():
@@ -97,6 +103,7 @@ def logininfo():
 
     return redirect("/feedpage")
 
+
 @app.route("/logout")
 def logout():
     """User log out."""
@@ -104,6 +111,7 @@ def logout():
     del session["user_id"]
     flash("You are logged out, see you soon.")
     return redirect("/")
+
 
 @app.route('/feedpage')
 @login_required
@@ -113,12 +121,14 @@ def feedpage():
 # Serverside event handler on an unnamed event
 # Namespace is to allow multiplex connections
 # Broadcast=True allows multiple clients. Which can estiblish chat between
-# each other. 
+# each other.
 
-# Check Flask-Socket.io authenticated_only 
+# Check Flask-Socket.io authenticated_only
 # https://flask-socketio.readthedocs.io/en/latest/.
 
 # Sqlachemy query response jsonifyable.
+
+
 def json_response(message):
     """Show query response in a json dict"""
     languages = db.session.query(User.language).distinct()
@@ -128,28 +138,32 @@ def json_response(message):
         translation_dicts.append({
             'language': translation.language,
             'text': translation.trans_text
-            })
+        })
 
-    return {'text': message.text,
-            # only return the first language translation. Need to loop for 
-            # all languages. 
-            'translations': translation_dicts,
-            'author': message.user.fname,  
-            # 'timestamp': message.timestamp
-            }
+    return {
+        'text': message.text,
+        # only return the first language translation. Need to loop for
+        # all languages.
+        'translations': translation_dicts,
+        'author': message.user.fname,
+        # 'timestamp': message.timestamp
+    }
+
 
 def translation_list(message):
     """Show a list of translations for given message."""
     languages = db.session.query(User.language).distinct()
-    # Loop over all existing user distinct languages. And translate the original message
-    # to each language. Add translated messages to database.
+    # Loop over all existing user distinct languages. And translate the
+    # original message to each language. Add translated messages to database.
     translation_list = {}
     for language in languages:
-    #     # languages returns a list of tuples. language is still a tuple of one element.
-    #     # index language[0] to fix it. 
-        translation_list[language] = translate_text(language[0], message).translated_text
+        #  languages returns a list of tuples. language is still a tuple of one
+        # element. index language[0] to fix it.
+        translation_list[language] = translate_text(
+            language[0], message).translated_text
 
     return translation_list
+
 
 @app.route("/messages")
 def show_messages():
@@ -157,7 +171,7 @@ def show_messages():
 
     messages = Message.query.all()
     # creating a list of dictionary to pass in the json_response function.
-    dict_messages= [json_response(message) for message in messages]
+    dict_messages = [json_response(message) for message in messages]
     return jsonify(dict_messages)
 
 
@@ -176,20 +190,18 @@ def send_message(msg_evt):
     emit('response', json_response(new_message), broadcast=True)
 
     # inserting translation to database.
-    for language, translation in translation_list(new_message.text).items():     
+    for language, translation in translation_list(new_message.text).items():
         message_id = new_message.message_id
-        new_translation = Translation(message_id=message_id, trans_text=translation,
+        new_translation = Translation(message_id=message_id,
+                                      trans_text=translation,
                                       language=language)
         db.session.add(new_translation)
     db.session.commit()
 
-if __name__ == '__main__': # pragma: no cover
+
+if __name__ == '__main__':  # pragma: no cover
 
     app.debug = True
 
     connect_to_db(app)
     socketio.run(app, host="0.0.0.0", debug=True)
-
-
-
-
