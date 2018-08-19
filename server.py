@@ -2,6 +2,7 @@
 
 from flask import Flask, session, render_template, request
 from flask import flash, redirect, url_for, g
+from flask import jsonify
 from flask_socketio import SocketIO
 from flask_socketio import send, emit
 from model import connect_to_db, db, User, Message, Chatroom
@@ -15,18 +16,18 @@ app = Flask(__name__)
 app.secret_key = os.environ['FLASK_SECRET_KEY']
 socketio = SocketIO(app)
 
-
-# Use g the thread local to check if a user is logged in. 
-# https://stackoverflow.com/questions/13617231/how-to-use-g-user-global-in-flask
-# before any request, assign g.
-@app.before_request
-def load_user():
-    """Check if user logged in for each route below."""
-    if session.get("user_id"):
-        user = User.query.filter_by(user_id=session["user_id"]).first()
-    else: 
-        user = None
-    g.user = user
+# Define globle user function. Call this function in the future g.user usage.
+# Memoization: to memorize the result of the query, in case the query is called
+# more then once. 
+def user():
+    # Check if g.user already called, then not query the database again.
+    if not hasattr(g, 'user'):
+        if session.get("user_id"):
+            user = User.query.filter_by(user_id=session["user_id"]).first()
+        else: 
+            user = None      
+        g.user = user   
+    return g.user
 
 #  Add a login_required decorator. This is to protect feedpage not being showed 
 #  if user not logged in.
@@ -34,7 +35,7 @@ def load_user():
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if g.user is None:
+        if user() is None:
             return redirect(url_for("loginpage", next=request.url))
         return f(*args, **kwargs)
     return decorated_function
@@ -76,11 +77,6 @@ def loginpage():
 
     return render_template("loginpage.html")
 
-@app.route('/feedpage')
-@login_required
-def feedpage():
-    return render_template('feedpage.html')
-
 @app.route("/login", methods=['POST'])
 def logininfo():
     """Login for the chatpage."""
@@ -109,6 +105,11 @@ def logout():
     flash("You are logged out, see you soon.")
     return redirect("/")
 
+@app.route('/feedpage')
+@login_required
+def feedpage():
+    return render_template('feedpage.html')
+
 # Serverside event handler on an unnamed event
 # Namespace is to allow multiplex connections
 # Broadcast=True allows multiple clients. Which can estiblish chat between
@@ -117,13 +118,43 @@ def logout():
 # Check Flask-Socket.io authenticated_only 
 # https://flask-socketio.readthedocs.io/en/latest/.
 
+# Sqlachemy query response jsonifyable.
+def json_response(message):
+    """Show query response in a json dict"""
+
+    return {'text': message.text,
+            # only return the first language translation. Need to loop for 
+            # all languages. 
+            'translation': 'nihao',
+            #message.translations[0].trans_text,
+            'author': message.user.fname,  
+            # 'timestamp': message.timestamp
+            }
+
+@app.route("/messages")
+def show_messages():
+    """Show messages on feedpage"""
+
+    messages = Message.query.all()
+
+    for message in messages:
+        # message.translation gives list of objects. All the translation for the 
+        # language. Here assgin it to one trans_text based on user's language
+        # selection. 
+        message.translation = Translation.query.filter_by(language=user().language,   
+                                            message_id=message.message_id).first()
+    # creating a list of dictionary to pass in the json_response function.
+    dict_messages= [json_response(message) for message in messages]
+    return jsonify(dict_messages)
+
+
 @socketio.on('update', namespace='/chat')
 def send_message(msg_evt):
 
     translation = translate_text('zh-CN', msg_evt['value']).translated_text
 
     text = msg_evt['value']
-    author_id = session['user_id']
+    author_id = user().user_id
     timestamp = datetime.now()
     chatroom_id = 1
     new_message = Message(author_id=author_id, timestamp=timestamp,
@@ -131,9 +162,7 @@ def send_message(msg_evt):
     db.session.add(new_message)
     db.session.commit()
     # Emit botht the message and the translation.
-    emit('response', {'value': msg_evt['value'],
-                      'translation': translation,
-                      'author': new_message.user.fname}, broadcast=True)
+    emit('response', json_response(new_message), broadcast=True)
 
     # Later, need to use session to define what translation to send back.
 

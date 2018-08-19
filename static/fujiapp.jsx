@@ -61,16 +61,19 @@ class MessageArea extends React.Component {
 class Feed extends React.Component {
   constructor(props) {
     super(props);
-    // this.state need to retrieve message with AJAX call??? on User log in
-    // show the most recent 100 messages.
-    // also need to fetch to get user language.
-    this.state = { messages: [] };
+    this.state = { messages: [] };  
     socket.on('response', function(msg_evt) {
-      const message = {author: msg_evt['author'],
-                       text: msg_evt['value'], 
-                       translation: msg_evt['translation']}
-      this.setState({messages: [...this.state.messages, message]});
+      this.setState({messages: [...this.state.messages, msg_evt]});
     }.bind(this));
+  }
+
+  // show initial log in feedpage history.
+  // fetch default is not work with cookies. To be able to use session
+  // add credentials:include.
+  componentDidMount() {
+    fetch('/messages', {credentials:'include'})
+      .then(response => response.json())
+      .then(data => this.setState({ messages: data }))
   }
 
   render() {
