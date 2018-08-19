@@ -80,8 +80,13 @@ class Feed extends React.Component {
     let messages = this.state.messages;
     // React for loop.
     let messageList = messages.map(function(message){
+      let translationList = message.translations.map(function(translation){
+        return <span>{translation.text}</span>;
+      })
       return <p>{message.author}<br></br>{message.text}<br></br>
-                {message.translation}</p>;
+                {translationList}</p>
+                // here is where I need to figure out clients language.
+                // filter out translation by user language.
     })
     return (
       <div className="messages">

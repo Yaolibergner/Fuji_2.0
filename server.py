@@ -121,28 +121,41 @@ def feedpage():
 # Sqlachemy query response jsonifyable.
 def json_response(message):
     """Show query response in a json dict"""
+    languages = db.session.query(User.language).distinct()
+    translation_dicts = []
+    # Converting a list of translations object to a list of translations dict.
+    for translation in message.translations:
+        translation_dicts.append({
+            'language': translation.language,
+            'text': translation.trans_text
+            })
 
     return {'text': message.text,
             # only return the first language translation. Need to loop for 
             # all languages. 
-            'translation': 'nihao',
-            #message.translations[0].trans_text,
+            'translations': translation_dicts,
             'author': message.user.fname,  
             # 'timestamp': message.timestamp
             }
+
+def translation_list(message):
+    """Show a list of translations for given message."""
+    languages = db.session.query(User.language).distinct()
+    # Loop over all existing user distinct languages. And translate the original message
+    # to each language. Add translated messages to database.
+    translation_list = {}
+    for language in languages:
+    #     # languages returns a list of tuples. language is still a tuple of one element.
+    #     # index language[0] to fix it. 
+        translation_list[language] = translate_text(language[0], message).translated_text
+
+    return translation_list
 
 @app.route("/messages")
 def show_messages():
     """Show messages on feedpage"""
 
     messages = Message.query.all()
-
-    for message in messages:
-        # message.translation gives list of objects. All the translation for the 
-        # language. Here assgin it to one trans_text based on user's language
-        # selection. 
-        message.translation = Translation.query.filter_by(language=user().language,   
-                                            message_id=message.message_id).first()
     # creating a list of dictionary to pass in the json_response function.
     dict_messages= [json_response(message) for message in messages]
     return jsonify(dict_messages)
@@ -150,8 +163,6 @@ def show_messages():
 
 @socketio.on('update', namespace='/chat')
 def send_message(msg_evt):
-
-    translation = translate_text('zh-CN', msg_evt['value']).translated_text
 
     text = msg_evt['value']
     author_id = user().user_id
@@ -164,23 +175,13 @@ def send_message(msg_evt):
     # Emit botht the message and the translation.
     emit('response', json_response(new_message), broadcast=True)
 
-    # Later, need to use session to define what translation to send back.
-
-
-
-    # languages = db.session.query(User.language).distinct()
-    # # Loop over all existing user distinct languages. And translate the original message
-    # # to each language. Add translated messages to database.
-    # for language in languages:
-    #     # languages returns a list of tuples. language is still a tuple of one element.
-    #     # index language[0] to fix it. 
-    #     trans_text = translate_text(language[0], message).translated_text
-    #     message_id = new_message.message_id
-    #     new_translation = Translation(message_id=message_id, trans_text=trans_text,
-    #                                   language=language)
-    #     db.session.add(new_translation)
-    
-    # db.session.commit()
+    # inserting translation to database.
+    for language, translation in translation_list(new_message.text).items():     
+        message_id = new_message.message_id
+        new_translation = Translation(message_id=message_id, trans_text=translation,
+                                      language=language)
+        db.session.add(new_translation)
+    db.session.commit()
 
 if __name__ == '__main__': # pragma: no cover
 
