@@ -59,7 +59,7 @@ class MessageArea extends React.Component {
 class Feed extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { messages: [] };
+    this.state = { messages: [], language: " " };
     socket.on(
       "response",
       function(msg_evt) {
@@ -72,19 +72,24 @@ class Feed extends React.Component {
   // Show initial log in feedpage history.
   // Fetch default is not work with cookies. To be able to use session
   // add credentials:include.
-  componentDidMount() {
+  componentWillMount() {
     fetch("/messages", { credentials: "include" })
       .then(response => response.json())
       .then(data => this.setState({ messages: data }));
+    fetch("/languages", {credentials: "include"})
+      .then(response => response.json())
+      .then(data => this.setState({language: data["language"]}))
   }
 
 
   render() {
     let messages = this.state.messages;
+    let userLanguage = this.state.language;
     // React for loop.
     let messageList = messages.map(function(message) {
       let translationList = message.translations.map(function(translation) {
-        return <span>{translation.text}</span>;
+        if (translation.language === userLanguage) {
+        return <span>{translation.text}</span>};
       });
       return (
         <p>
@@ -98,6 +103,7 @@ class Feed extends React.Component {
       // here is where I need to figure out clients language.
       // filter out translation by user language.
     });
+    console.log(messageList);
     return <div className="messages">{messageList}</div>;
   }
 }
