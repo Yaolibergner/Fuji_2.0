@@ -1,6 +1,5 @@
 "use strict";
 
-// Does this usually go globally?
 let socket = io.connect(
   "http://" + document.domain + ":" + location.port + "/chat"
 );
@@ -64,19 +63,21 @@ class Feed extends React.Component {
     socket.on(
       "response",
       function(msg_evt) {
+        // User Spread to append msg_evt to the feed area.
         this.setState({ messages: [...this.state.messages, msg_evt] });
       }.bind(this)
     );
   }
 
-  // show initial log in feedpage history.
-  // fetch default is not work with cookies. To be able to use session
+  // Show initial log in feedpage history.
+  // Fetch default is not work with cookies. To be able to use session
   // add credentials:include.
   componentDidMount() {
     fetch("/messages", { credentials: "include" })
       .then(response => response.json())
       .then(data => this.setState({ messages: data }));
   }
+
 
   render() {
     let messages = this.state.messages;

@@ -1,4 +1,3 @@
-# To initialize socketio to flask application.
 
 from flask import Flask, session, render_template, request
 from flask import flash, redirect, url_for, g
@@ -118,13 +117,6 @@ def logout():
 def feedpage():
     return render_template('feedpage.html')
 
-# Serverside event handler on an unnamed event
-# Namespace is to allow multiplex connections
-# Broadcast=True allows multiple clients. Which can estiblish chat between
-# each other.
-
-# Check Flask-Socket.io authenticated_only
-# https://flask-socketio.readthedocs.io/en/latest/.
 
 # Sqlachemy query response jsonifyable.
 
@@ -142,8 +134,6 @@ def json_response(message):
 
     return {
         'text': message.text,
-        # only return the first language translation. Need to loop for
-        # all languages.
         'translations': translation_dicts,
         'author': message.user.fname,
         # 'timestamp': message.timestamp
@@ -153,26 +143,44 @@ def json_response(message):
 def translation_list(message):
     """Show a list of translations for given message."""
     languages = db.session.query(User.language).distinct()
-    # Loop over all existing user distinct languages. And translate the
-    # original message to each language. Add translated messages to database.
+    # Loop over all existing user distinct languages.
     translation_list = {}
     for language in languages:
-        #  languages returns a list of tuples. language is still a tuple of one
-        # element. index language[0] to fix it.
+        # Languages returns a list of tuples. Language is still a tuple of one
+        # element, index language[0] to get the language itself.
         translation_list[language] = translate_text(
             language[0], message).translated_text
 
     return translation_list
 
+# A messages route with no html, this is to show the jsonified messages.
 
-@app.route("/messages")
+
+@app.route('/messages')
 def show_messages():
-    """Show messages on feedpage"""
+    """Show jsonified messages"""
 
     messages = Message.query.all()
     # creating a list of dictionary to pass in the json_response function.
     dict_messages = [json_response(message) for message in messages]
     return jsonify(dict_messages)
+
+
+# A languages route with no html, this is to pass in to client.
+@app.route('/languages')
+def user_languages():
+    """Show jsonified user languages."""
+
+    return jsonify({
+        'user': user().user_id,
+        'language': user().language
+    })
+
+
+# Serverside event handler on an unnamed event
+# Namespace is to allow multiplex connections
+# Broadcast=True allows multiple clients. Which can estiblish chat between
+# each other.
 
 
 @socketio.on('update', namespace='/chat')
@@ -186,10 +194,8 @@ def send_message(msg_evt):
                           text=text, chatroom_id=chatroom_id)
     db.session.add(new_message)
     db.session.commit()
-    # Emit botht the message and the translation.
-    emit('response', json_response(new_message), broadcast=True)
 
-    # inserting translation to database.
+    # Inserting translation to database.
     for language, translation in translation_list(new_message.text).items():
         message_id = new_message.message_id
         new_translation = Translation(message_id=message_id,
@@ -197,6 +203,9 @@ def send_message(msg_evt):
                                       language=language)
         db.session.add(new_translation)
     db.session.commit()
+
+    # Emit both the message and the translation.
+    emit('response', json_response(new_message), broadcast=True)
 
 
 if __name__ == '__main__':  # pragma: no cover
