@@ -163,6 +163,7 @@ def show_messages():
     messages = Message.query.all()
     # creating a list of dictionary to pass in the json_response function.
     dict_messages = [json_response(message) for message in messages]
+    # jsonify only works with list and dictionary.
     return jsonify(dict_messages)
 
 
@@ -193,7 +194,6 @@ def send_message(msg_evt):
     new_message = Message(author_id=author_id, timestamp=timestamp,
                           text=text, chatroom_id=chatroom_id)
     db.session.add(new_message)
-    db.session.commit()
 
     # Inserting translation to database.
     for language, translation in translation_list(new_message.text).items():

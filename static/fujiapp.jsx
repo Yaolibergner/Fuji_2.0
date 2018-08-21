@@ -36,6 +36,7 @@ class MessageArea extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  // to update this.state.value everytime something is typed before submit.
   handleChange(event) {
     this.setState({ value: event.target.value });
   }
@@ -60,27 +61,26 @@ class Feed extends React.Component {
   constructor(props) {
     super(props);
     this.state = { messages: [], language: " " };
-    socket.on(
-      "response",
-      function(msg_evt) {
-        // User Spread to append msg_evt to the feed area.
-        this.setState({ messages: [...this.state.messages, msg_evt] });
-      }.bind(this)
-    );
   }
 
   // Show initial log in feedpage history.
   // Fetch default is not work with cookies. To be able to use session
   // add credentials:include.
+  // Use componentWillMount to get messages and lanuages before render.
   componentWillMount() {
+   socket.on(
+    "response",
+    msg_evt => {
+      // User Spread to append msg_evt to the feed area.
+      this.setState({ messages: [...this.state.messages, msg_evt] });
+    });
     fetch("/messages", { credentials: "include" })
       .then(response => response.json())
       .then(data => this.setState({ messages: data }));
-    fetch("/languages", {credentials: "include"})
+    fetch("/languages", { credentials: "include" })
       .then(response => response.json())
-      .then(data => this.setState({language: data["language"]}))
+      .then(data => this.setState({ language: data["language"] }));
   }
-
 
   render() {
     let messages = this.state.messages;
@@ -89,7 +89,8 @@ class Feed extends React.Component {
     let messageList = messages.map(function(message) {
       let translationList = message.translations.map(function(translation) {
         if (translation.language === userLanguage) {
-        return <span>{translation.text}</span>};
+          return <span>{translation.text}</span>;
+        }
       });
       return (
         <p>
@@ -100,10 +101,7 @@ class Feed extends React.Component {
           {translationList}
         </p>
       );
-      // here is where I need to figure out clients language.
-      // filter out translation by user language.
     });
-    console.log(messageList);
     return <div className="messages">{messageList}</div>;
   }
 }
