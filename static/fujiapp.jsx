@@ -60,11 +60,34 @@ const NavBar = () => {
           <Typography variant="title" color="inherit">
             Welcome to Fuji Chat!
           </Typography>
+          <LogoutButton />
         </Toolbar>
       </AppBar>
     </div>
   );
 };
+
+// Creact a logout button.
+class LogoutButton extends React.Component {
+
+  handleClick(event) {
+      window.location.href='/logout';
+  }
+
+  render() {
+      return (
+        <div style={{marginLeft: 320}}>
+          <Button
+            onClick={this.handleClick}
+            variant="contained"
+            color="secondary"
+          >
+            Logout
+          </Button>
+        </div>
+      );
+    }
+}
 
 // MessageArea component that's a child of FujiApp root component
 class MessageArea extends React.Component {
