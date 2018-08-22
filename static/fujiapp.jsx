@@ -1,5 +1,34 @@
 "use strict";
 
+// Import below toolbars from Material UI.
+const {
+  AppBar,
+  Button,
+  colors,
+  createMuiTheme,
+  CssBaseline,
+  FormControl,
+  Grid,
+  Icon,
+  Input,
+  MuiThemeProvider,
+  Paper,
+  Typography,
+  Toolbar,
+  withStyles
+} = window["material-ui"];
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: "#F5F5F5"
+    },
+    secondary: {
+      main: "#FFCCBC"
+    }
+  }
+});
+
 let socket = io.connect(
   "http://" + document.domain + ":" + location.port + "/chat"
 );
@@ -8,21 +37,34 @@ let socket = io.connect(
 class FujiApp extends React.Component {
   render() {
     return (
-      <div className="feedpage">
-        <Welcome />
-        <Feed />
-        <MessageArea />
-      </div>
+      <MuiThemeProvider theme={theme}>
+        <CssBaseline />
+        <div style={{ display: "flex" }}>
+          <NavBar />
+          <main style={{ height: "100vh", overflow: "auto", flexGrow: 1 }}>
+            <Feed />
+            <MessageArea />
+          </main>
+        </div>
+      </MuiThemeProvider>
     );
   }
 }
 
-// A welcome title.
-class Welcome extends React.Component {
-  render() {
-    return <h3 className="Wecome-title">Welcome to Fuji.</h3>;
-  }
-}
+// Material UI design
+const NavBar = () => {
+  return (
+    <div>
+      <AppBar position="absolute">
+        <Toolbar>
+          <Typography variant="title" color="inherit">
+            Welcome to Fuji Chat!
+          </Typography>
+        </Toolbar>
+      </AppBar>
+    </div>
+  );
+};
 
 // MessageArea component that's a child of FujiApp root component
 class MessageArea extends React.Component {
@@ -30,10 +72,10 @@ class MessageArea extends React.Component {
     super(props);
     this.state = {
       // Current value as placeholder.
-      value: "Type your message."
+      value: ""
     };
     this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   // to update this.state.value everytime something is typed before submit.
@@ -41,17 +83,49 @@ class MessageArea extends React.Component {
     this.setState({ value: event.target.value });
   }
 
-  handleSubmit(event) {
+  handleClick(event) {
     socket.emit("update", { value: this.state.value });
-    event.preventDefault();
+    // event.preventDefault();
   }
 
+  // Material UI send button.
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
-        <textarea value={this.state.value} onChange={this.handleChange} />
-        <input type="submit" value="Submit" />
-      </form>
+      <div
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          margin: 20
+        }}
+      >
+        <Paper>
+          <div style={{ padding: 10 }}>
+            <Grid container spacing={8} alignItems="flex-end">
+              <Grid item xs>
+                <Input
+                  disableUnderline
+                  fullWidth
+                  placeholder="Messages"
+                  value={this.state.value}
+                  onChange={this.handleChange}
+                />
+              </Grid>
+              <Grid item>
+                <Button
+                  onClick={this.handleClick}
+                  variant="contained"
+                  color="secondary"
+                >
+                  Send
+                  <Icon>send</Icon>
+                </Button>
+              </Grid>
+            </Grid>
+          </div>
+        </Paper>
+      </div>
     );
   }
 }
@@ -68,10 +142,8 @@ class Feed extends React.Component {
   // add credentials:include.
   // Use componentWillMount to get messages and lanuages before render.
   componentWillMount() {
-   socket.on(
-    "response",
-    msg_evt => {
-      // User Spread to append msg_evt to the feed area.
+    socket.on("response", msg_evt => {
+      // Use Spread to append msg_evt to the feed area.
       this.setState({ messages: [...this.state.messages, msg_evt] });
     });
     fetch("/messages", { credentials: "include" })
@@ -102,7 +174,11 @@ class Feed extends React.Component {
         </p>
       );
     });
-    return <div className="messages">{messageList}</div>;
+    return (
+      <Typography>
+        <div style={{ margin: 10, marginBottom: 80 }}>{messageList}</div>
+      </Typography>
+    );
   }
 }
 
