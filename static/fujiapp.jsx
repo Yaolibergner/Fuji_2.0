@@ -57,9 +57,11 @@ const NavBar = () => {
     <div>
       <AppBar position="absolute">
         <Toolbar>
+        <div style={{flexGrow: 1}} >
           <Typography variant="title" color="inherit">
             Welcome to Fuji Chat!
           </Typography>
+        </div>
           <LogoutButton />
         </Toolbar>
       </AppBar>
@@ -76,7 +78,7 @@ class LogoutButton extends React.Component {
 
   render() {
       return (
-        <div style={{marginLeft: 320}}>
+        <div style={{float: "right"}}>
           <Button
             onClick={this.handleClick}
             variant="contained"
@@ -199,7 +201,7 @@ class Feed extends React.Component {
     });
     return (
       <Typography>
-        <div style={{ margin: 10, marginBottom: 80 }}>{messageList}</div>
+        <div style={{ margin: 10, marginBottom: 100 }}>{messageList}</div>
       </Typography>
     );
   }
