@@ -57,11 +57,11 @@ const NavBar = () => {
     <div>
       <AppBar position="absolute">
         <Toolbar>
-        <div style={{flexGrow: 1}} >
-          <Typography variant="title" color="inherit">
-            Welcome to Fuji Chat!
-          </Typography>
-        </div>
+          <div style={{ flexGrow: 1 }}>
+            <Typography variant="title" color="inherit">
+              Welcome to Fuji Chat!
+            </Typography>
+          </div>
           <LogoutButton />
         </Toolbar>
       </AppBar>
@@ -71,24 +71,23 @@ const NavBar = () => {
 
 // Creact a logout button.
 class LogoutButton extends React.Component {
-
   handleClick(event) {
-      window.location.href='/logout';
+    window.location.href = "/logout";
   }
 
   render() {
-      return (
-        <div style={{float: "right"}}>
-          <Button
-            onClick={this.handleClick}
-            variant="contained"
-            color="secondary"
-          >
-            Logout
-          </Button>
-        </div>
-      );
-    }
+    return (
+      <div style={{ float: "right" }}>
+        <Button
+          onClick={this.handleClick}
+          variant="contained"
+          color="secondary"
+        >
+          Logout
+        </Button>
+      </div>
+    );
+  }
 }
 
 // MessageArea component that's a child of FujiApp root component
@@ -103,6 +102,12 @@ class MessageArea extends React.Component {
     this.handleClick = this.handleClick.bind(this);
   }
 
+  // Scroll to the bottom after message received.
+  // componentDidUpdate() {
+  //   const element = document.getElementById(this.state.value);
+  //   element.scrollIntoView({behavior: "smooth"});
+  // }
+
   // to update this.state.value everytime something is typed before submit.
   handleChange(event) {
     this.setState({ value: event.target.value });
@@ -110,7 +115,8 @@ class MessageArea extends React.Component {
 
   handleClick(event) {
     socket.emit("update", { value: this.state.value });
-    // event.preventDefault();
+    this.setState({ value: "" });
+    // window.scroll({top: , behavior: "smooth"})
   }
 
   // Material UI send button.
@@ -178,6 +184,23 @@ class Feed extends React.Component {
       .then(response => response.json())
       .then(data => this.setState({ language: data["language"] }));
   }
+  // // Create the scrollToBottom.
+  // scrollToBottom() {
+  //   const { messageList } = this.refs;
+  //   console.log(this.messageList)
+  //   const scrollHeight = this.messageList.scrollHeight;
+  //   console.log(scrollHeight)
+  //   const height = this.messageList.clientHeight;
+  //   console.log(this.messageList)
+  //   const maxScrollTop = scrollHeight - height;
+  //   console.log(maxScrollTop)
+  //   this.messageList.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
+  // }
+  // // Invoke scrollToBottom when data changes. This function will fire
+  // // everytime the component is updated.
+  // componentDidUpdate() {
+  //   this.scrollToBottom();
+  // }
 
   render() {
     let messages = this.state.messages;
