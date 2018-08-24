@@ -135,6 +135,7 @@ def json_response(message):
         'text': message.text,
         'translations': translation_dicts,
         'author': message.user.fname,
+        'author_id': message.author_id
         # 'timestamp': message.timestamp
     }
 

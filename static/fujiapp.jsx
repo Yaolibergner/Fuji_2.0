@@ -1,5 +1,5 @@
 "use strict";
-
+// const React = require('react')
 // Import below toolbars from Material UI.
 const {
   AppBar,
@@ -98,8 +98,8 @@ class MessageArea extends React.Component {
       // Current value as placeholder.
       value: ""
     };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleClick = this.handleClick.bind(this);
+    this.handleOnChange = this.handleOnChange.bind(this);
+    this.handleOnClick = this.handleOnClick.bind(this);
   }
 
   // Scroll to the bottom after message received.
@@ -109,14 +109,15 @@ class MessageArea extends React.Component {
   // }
 
   // to update this.state.value everytime something is typed before submit.
-  handleChange(event) {
+  handleOnChange(event) {
     this.setState({ value: event.target.value });
   }
 
-  handleClick(event) {
+  handleOnClick(event) {
     socket.emit("update", { value: this.state.value });
     this.setState({ value: "" });
-    // window.scroll({top: , behavior: "smooth"})
+    // console.log(">>>>>>>", document.body.scrollHeight)
+    // window.scrollTo(0, document.body.scrollHeight)
   }
 
   // Material UI send button.
@@ -128,7 +129,7 @@ class MessageArea extends React.Component {
           bottom: 0,
           left: 0,
           right: 0,
-          margin: 20
+          margin: 20,
         }}
       >
         <Paper>
@@ -140,12 +141,12 @@ class MessageArea extends React.Component {
                   fullWidth
                   placeholder="Messages"
                   value={this.state.value}
-                  onChange={this.handleChange}
+                  onChange={this.handleOnChange}
                 />
               </Grid>
               <Grid item>
                 <Button
-                  onClick={this.handleClick}
+                  onClick={this.handleOnClick}
                   variant="contained"
                   color="secondary"
                 >
@@ -166,6 +167,8 @@ class Feed extends React.Component {
   constructor(props) {
     super(props);
     this.state = { messages: [], language: " " };
+    // this.messageBody = React.createRef();
+    this.scrollToBottom = this.scrollToBottom.bind(this)
   }
 
   // Show initial log in feedpage history.
@@ -182,29 +185,42 @@ class Feed extends React.Component {
       .then(data => this.setState({ messages: data }));
     fetch("/languages", { credentials: "include" })
       .then(response => response.json())
-      .then(data => this.setState({ language: data["language"] }));
+      .then(data =>
+        this.setState({ language: data["language"], user: data["user"] })
+      );
   }
   // // Create the scrollToBottom.
   // scrollToBottom() {
-  //   const { messageList } = this.refs;
-  //   console.log(this.messageList)
-  //   const scrollHeight = this.messageList.scrollHeight;
+  //   console.log(this.messageBody)
+  //   const scrollHeight = this.messageBody.scrollHeight;
   //   console.log(scrollHeight)
-  //   const height = this.messageList.clientHeight;
-  //   console.log(this.messageList)
+  //   const height = this.messageBody.height;
+  //   console.log(this.messageBody)
   //   const maxScrollTop = scrollHeight - height;
   //   console.log(maxScrollTop)
-  //   this.messageList.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
+  //   this.messageBody.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
   // }
   // // Invoke scrollToBottom when data changes. This function will fire
   // // everytime the component is updated.
+
+  scrollToBottom() {
+    // what is block end????
+    this.el.scrollIntoView({ block: "end", behavior: "smooth"});
+    console.log(this.el)
+  }
+
+  componentDidUpdate() {
+    this.scrollToBottom();
+  }
   // componentDidUpdate() {
-  //   this.scrollToBottom();
+  //   const messageBody = document.getElementById("messageBody");
+  //   messageBody.scrollTop = messageBody.scrollHeight;
   // }
 
   render() {
     let messages = this.state.messages;
     let userLanguage = this.state.language;
+    let user = this.state.user;
     // React for loop.
     let messageList = messages.map(function(message) {
       let translationList = message.translations.map(function(translation) {
@@ -212,19 +228,34 @@ class Feed extends React.Component {
           return <span>{translation.text}</span>;
         }
       });
-      return (
-        <p>
-          {message.author}
-          <br />
-          {message.text}
-          <br />
-          {translationList}
-        </p>
-      );
+      if (
+        message.author_id !== user
+        // && message.text !== translation.text Why is translation.text not defined.
+      ) {
+        return (
+          <p>
+            {message.author}
+            <br />
+            {message.text}
+            <br />
+            {translationList}
+          </p>
+        );
+      } else {
+        return (
+          <p>
+            {message.author}
+            <br />
+            {message.text}
+          </p>
+        );
+      }
     });
     return (
       <Typography>
-        <div style={{ margin: 10, marginBottom: 100 }}>{messageList}</div>
+        <div style={{ margin: 10, marginBottom: 100, marginTop: 75 }} ref={el => {this.el = el;}}>
+          {messageList}
+        </div>
       </Typography>
     );
   }
