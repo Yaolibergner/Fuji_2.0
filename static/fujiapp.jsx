@@ -112,6 +112,14 @@ class MessageArea extends React.Component {
     this.setState({ value: "" });
   }
 
+  // Allowing enter key to send message.
+  enterPressed(event) {
+    if(event.key == "Enter") {
+      socket.emit("update", { value: this.state.value });
+      this.setState({ value: "" });
+    }
+  }
+
   // Material UI send button.
   render() {
     return (
@@ -134,6 +142,7 @@ class MessageArea extends React.Component {
                   placeholder="Messages"
                   value={this.state.value}
                   onChange={this.handleOnChange}
+                  onKeyPress={this.enterPressed.bind(this)}
                 />
               </Grid>
               <Grid item>
