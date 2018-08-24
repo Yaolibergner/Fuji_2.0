@@ -102,12 +102,6 @@ class MessageArea extends React.Component {
     this.handleOnClick = this.handleOnClick.bind(this);
   }
 
-  // Scroll to the bottom after message received.
-  // componentDidUpdate() {
-  //   const element = document.getElementById(this.state.value);
-  //   element.scrollIntoView({behavior: "smooth"});
-  // }
-
   // to update this.state.value everytime something is typed before submit.
   handleOnChange(event) {
     this.setState({ value: event.target.value });
@@ -116,8 +110,6 @@ class MessageArea extends React.Component {
   handleOnClick(event) {
     socket.emit("update", { value: this.state.value });
     this.setState({ value: "" });
-    // console.log(">>>>>>>", document.body.scrollHeight)
-    // window.scrollTo(0, document.body.scrollHeight)
   }
 
   // Material UI send button.
@@ -129,7 +121,7 @@ class MessageArea extends React.Component {
           bottom: 0,
           left: 0,
           right: 0,
-          margin: 20,
+          margin: 20
         }}
       >
         <Paper>
@@ -167,8 +159,7 @@ class Feed extends React.Component {
   constructor(props) {
     super(props);
     this.state = { messages: [], language: " " };
-    // this.messageBody = React.createRef();
-    this.scrollToBottom = this.scrollToBottom.bind(this)
+    this.scrollToBottom = this.scrollToBottom.bind(this);
   }
 
   // Show initial log in feedpage history.
@@ -189,33 +180,14 @@ class Feed extends React.Component {
         this.setState({ language: data["language"], user: data["user"] })
       );
   }
-  // // Create the scrollToBottom.
-  // scrollToBottom() {
-  //   console.log(this.messageBody)
-  //   const scrollHeight = this.messageBody.scrollHeight;
-  //   console.log(scrollHeight)
-  //   const height = this.messageBody.height;
-  //   console.log(this.messageBody)
-  //   const maxScrollTop = scrollHeight - height;
-  //   console.log(maxScrollTop)
-  //   this.messageBody.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
-  // }
-  // // Invoke scrollToBottom when data changes. This function will fire
-  // // everytime the component is updated.
 
   scrollToBottom() {
-    // what is block end????
-    this.el.scrollIntoView({ block: "end", behavior: "smooth"});
-    console.log(this.el)
+    this.el.scrollIntoView({ block: "end", behavior: "smooth" });
   }
 
   componentDidUpdate() {
     this.scrollToBottom();
   }
-  // componentDidUpdate() {
-  //   const messageBody = document.getElementById("messageBody");
-  //   messageBody.scrollTop = messageBody.scrollHeight;
-  // }
 
   render() {
     let messages = this.state.messages;
@@ -224,14 +196,14 @@ class Feed extends React.Component {
     // React for loop.
     let messageList = messages.map(function(message) {
       let translationList = message.translations.map(function(translation) {
-        if (translation.language === userLanguage) {
+        if (
+          translation.language === userLanguage &&
+          message.text !== translation.text
+        ) {
           return <span>{translation.text}</span>;
         }
       });
-      if (
-        message.author_id !== user
-        // && message.text !== translation.text Why is translation.text not defined.
-      ) {
+      if (message.author_id !== user) {
         return (
           <p>
             {message.author}
@@ -253,7 +225,12 @@ class Feed extends React.Component {
     });
     return (
       <Typography>
-        <div style={{ margin: 10, marginBottom: 100, marginTop: 75 }} ref={el => {this.el = el;}}>
+        <div
+          style={{ margin: 10, paddingBottom: 100, marginTop: 75 }}
+          ref={el => {
+            this.el = el;
+          }}
+        >
           {messageList}
         </div>
       </Typography>
