@@ -1,5 +1,4 @@
 "use strict";
-// const React = require('react')
 // Import below toolbars from Material UI.
 const {
   AppBar,
@@ -195,6 +194,7 @@ class Feed extends React.Component {
     this.el.scrollIntoView({ block: "end", behavior: "smooth" });
   }
 
+  // Scrolltobottom when message sent.
   componentDidUpdate() {
     this.scrollToBottom();
   }

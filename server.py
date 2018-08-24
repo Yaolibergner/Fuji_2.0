@@ -10,10 +10,12 @@ from datetime import datetime
 from translate import translate_text
 from functools import wraps
 import os
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 app.secret_key = os.environ['FLASK_SECRET_KEY']
 socketio = SocketIO(app)
+bcrypt = Bcrypt(app)
 
 # Define globle user function. Call this function in the future g.user usage.
 # Memoization: to memorize the result of the query, in case the query is called
@@ -62,11 +64,12 @@ def add_user():
 
     email = request.form.get("email")
     password = request.form.get("password")
+    hash_pw = bcrypt.generate_password_hash(password, 10).decode("utf-8")
     fname = request.form.get("fname")
     lname = request.form.get("lname")
     language = request.form.get("language")
 
-    new_user = User(email=email, password=password, fname=fname,
+    new_user = User(email=email, password=hash_pw, fname=fname,
                     lname=lname, language=language)
 
     db.session.add(new_user)
@@ -88,13 +91,15 @@ def logininfo():
 
     email = request.form.get("email")
     password = request.form.get("password")
+    hash_pw = bcrypt.generate_password_hash(password, 10).decode("utf-8")
+    check_pw = bcrypt.check_password_hash(hash_pw, password)
 
     user = User.query.filter_by(email=email).first()
     # import pdb; pdb.set_trace()
     if not user:
         return redirect("/register")
 
-    if user.password != password:
+    if not check_pw :
         flash('Invalid password, please try again!')
         return redirect("/")
 
