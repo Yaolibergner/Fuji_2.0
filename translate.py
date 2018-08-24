@@ -19,10 +19,8 @@ def translate_text(target, text):
 
     # Text can also be a sequence of strings, in which case this method
     # will return a sequence of results for each text.
-    result = translate_client.translate(text, target_language=target)
+    # format_='text' is to change the html encoding to text.
+    result = translate_client.translate(text, target_language=target, format_='text')
     
     return TranslateResult(result)
-
-# Print hello world to test the translation function.
-# print(translate_text('zh-CN', 'hello world').translated_text)
 

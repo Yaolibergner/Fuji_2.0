@@ -186,7 +186,6 @@ def user_languages():
 
 @socketio.on('update', namespace='/chat')
 def send_message(msg_evt):
-
     text = msg_evt['value']
     author_id = user().user_id
     timestamp = datetime.now()
