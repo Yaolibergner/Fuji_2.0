@@ -138,6 +138,7 @@ class MessageArea extends React.Component {
               </Grid>
               <Grid item>
                 <Button
+                  disabled={this.state.value === ""}
                   onClick={this.handleOnClick}
                   variant="contained"
                   color="secondary"
