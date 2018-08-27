@@ -216,6 +216,8 @@ class Feed extends React.Component {
       if (message.author_id !== user) {
         return (
           <p>
+            <img src={'/uploads/'+ message.author_id + '.jpg'}
+            style={{ weight: 50, height: 50, borderRadius: '50%' }}/>
             {message.author}
             <br />
             {message.text}
@@ -226,6 +228,8 @@ class Feed extends React.Component {
       } else {
         return (
           <p>
+            <img src={'/uploads/'+ message.author_id + '.jpg'}
+            style={{ weight: 50, height: 50, borderRadius: '50%'}}/>
             {message.author}
             <br />
             {message.text}

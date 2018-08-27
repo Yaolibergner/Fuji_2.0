@@ -11,6 +11,12 @@ from translate import translate_text
 from functools import wraps
 import os
 from flask_bcrypt import Bcrypt
+from werkzeug.utils import secure_filename
+from flask import send_from_directory
+
+
+UPLOAD_FOLDER = '/home/vagrant/src/_FUJI_2.0/uploads'
+ALLOWED_EXTENSIONS = set(['jpeg', 'jpg'])
 
 app = Flask(__name__)
 app.secret_key = os.environ['FLASK_SECRET_KEY']
@@ -53,9 +59,19 @@ def register_form():
     # A dictionary of language options with it's keys. Key as html option id
     # dict[key] as language options.
     lang_option = {"en": "English", "sv": "Swedish", "zh-CN": "Chinese",
-                   "es": "Spanish", "fr": "French", "ru": "Russian"}
+                   "es": "Spanish", "fr": "French", "ru": "Russian",
+                   "ar": 'Arabic', "bg": "Bulgarian", "da": "Danish",
+                   "fi": "Finnish", "el": "Greek", "hi": "Hindi", "de": "German",
+                   "ko": "Korean", "la": "Latin", "pl": "Polish", "pt": "Portuguese"}
 
     return render_template("register.html", lang_option=lang_option)
+
+
+def allowed_file(filename):
+    """Allow user upload profile picture."""
+
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @app.route('/register', methods=['POST'])
@@ -75,7 +91,27 @@ def add_user():
     db.session.add(new_user)
     db.session.commit()
 
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' in request.files:
+            file = request.files['file']
+    # if user does not select file, browser also
+    # submit an empty part without filename
+            if file.filename != '':
+                if file and allowed_file(file.filename):
+                    filename = secure_filename(
+                        "{}.jpg".format(new_user.user_id))
+                    file.save(os.path.join(
+                        app.config['UPLOAD_FOLDER'], filename))
+
     return redirect("/")
+
+
+# http://flask.pocoo.org/docs/0.12/patterns/fileuploads/
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'],
+                               filename)
 
 
 @app.route("/")
@@ -99,7 +135,7 @@ def logininfo():
     if not user:
         return redirect("/register")
 
-    if not check_pw :
+    if not check_pw:
         flash('Invalid password, please try again!')
         return redirect("/")
 
@@ -215,6 +251,6 @@ def send_message(msg_evt):
 if __name__ == '__main__':  # pragma: no cover
 
     app.debug = True
-
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     connect_to_db(app)
     socketio.run(app, host="0.0.0.0", debug=True)

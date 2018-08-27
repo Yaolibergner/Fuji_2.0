@@ -10,7 +10,7 @@
     </div>
         <div class="title">Register</div>
     </div>
-        <form action="/register" method="POST">
+        <form action="/register" method="POST" enctype=multipart/form-data>
             <div class="bottom_wrapper clearfix">
                 <div class="message_input_wrapper">
                 <input class="message_input" name="email" required placeholder="Email"/>
@@ -40,6 +40,10 @@
                   {% endfor %} 
                 </select>  
                 </div> 
+                <div class="bottom_wrapper clearfix">
+                    <h4>Upload profile photo</h4>
+                      <input type=file name=file>
+                </div>
                 <div class="bottom_wrapper clearfix">
                 <input type="submit">   
               </div>
