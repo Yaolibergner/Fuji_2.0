@@ -42,6 +42,7 @@ class FujiApp extends React.Component {
           <NavBar />
           <main style={{ height: "100vh", overflow: "auto", flexGrow: 1 }}>
             <Feed />
+            {/*    <Typing />*/}
             <MessageArea />
           </main>
         </div>
@@ -95,17 +96,28 @@ class MessageArea extends React.Component {
     super(props);
     this.state = {
       // Current value as placeholder.
-      value: ""
+      value: "",
+      // Current typing user.
+      user: ""
     };
     this.handleOnChange = this.handleOnChange.bind(this);
     this.handleOnClick = this.handleOnClick.bind(this);
   }
 
+  // to get current user, and then emit to the server to show who is typing.
+  componentWillMount() {
+    fetch("/languages", { credentials: "include" })
+      .then(response => response.json())
+      .then(data => this.setState({ user: data["user"] }));
+  }
   // to update this.state.value everytime something is typed before submit.
   handleOnChange(event) {
     this.setState({ value: event.target.value });
+    // to send server that client is typing.
+    socket.emit("typing", { value: this.state.user });
   }
 
+  // update textarea state, empty textarea once message is sent.
   handleOnClick(event) {
     socket.emit("update", { value: this.state.value });
     this.setState({ value: "" });
@@ -113,7 +125,7 @@ class MessageArea extends React.Component {
 
   // Allowing enter key to send message.
   enterPressed(event) {
-    if(event.key == "Enter") {
+    if (event.key == "Enter") {
       socket.emit("update", { value: this.state.value });
       this.setState({ value: "" });
     }
@@ -138,7 +150,7 @@ class MessageArea extends React.Component {
                 <Input
                   disableUnderline
                   fullWidth
-                  placeholder="Messages"
+                  placeholder="Say something..."
                   value={this.state.value}
                   onChange={this.handleOnChange}
                   onKeyPress={this.enterPressed.bind(this)}
@@ -167,7 +179,7 @@ class MessageArea extends React.Component {
 class Feed extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { messages: [], language: " " };
+    this.state = { messages: [], language: " ", typing_user: "" };
     this.scrollToBottom = this.scrollToBottom.bind(this);
   }
 
@@ -188,6 +200,13 @@ class Feed extends React.Component {
       .then(data =>
         this.setState({ language: data["language"], user: data["user"] })
       );
+    socket.on("status", user_evt => {
+      let user = this.state.user;
+      // Use Spread to append msg_evt to the feed area.
+      if (user_evt["value"] !== user) {
+        this.setState({ typing_user: user_evt["value"] });
+      }
+    });
   }
 
   scrollToBottom() {
@@ -203,6 +222,7 @@ class Feed extends React.Component {
     let messages = this.state.messages;
     let userLanguage = this.state.language;
     let user = this.state.user;
+    let typing_user = this.state.typing_user;
     // React for loop.
     let messageList = messages.map(function(message) {
       let translationList = message.translations.map(function(translation) {
@@ -216,8 +236,10 @@ class Feed extends React.Component {
       if (message.author_id !== user) {
         return (
           <p>
-            <img src={'/uploads/'+ message.author_id + '.jpg'}
-            style={{ weight: 50, height: 50, borderRadius: '50%' }}/>
+            <img
+              src={"/uploads/" + message.author_id + ".jpg"}
+              style={{ weight: 50, height: 50, borderRadius: "50%" }}
+            />
             {message.author}
             <br />
             {message.text}
@@ -228,8 +250,10 @@ class Feed extends React.Component {
       } else {
         return (
           <p>
-            <img src={'/uploads/'+ message.author_id + '.jpg'}
-            style={{ weight: 50, height: 50, borderRadius: '50%'}}/>
+            <img
+              src={"/uploads/" + message.author_id + ".jpg"}
+              style={{ weight: 50, height: 50, borderRadius: "50%" }}
+            />
             {message.author}
             <br />
             {message.text}
@@ -237,6 +261,18 @@ class Feed extends React.Component {
         );
       }
     });
+    let isTyping = "";
+    if (typing_user !== "") {
+      isTyping = (
+        <span>
+          <img
+            src={"/uploads/" + typing_user + ".jpg"}
+            style={{ weight: 20, height: 20, borderRadius: "50%" }}
+          />{" "}
+          is typing...
+        </span>
+      );
+    }
     return (
       <Typography>
         <div
@@ -246,6 +282,7 @@ class Feed extends React.Component {
           }}
         >
           {messageList}
+          <span> {isTyping} </span>
         </div>
       </Typography>
     );

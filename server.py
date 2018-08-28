@@ -227,6 +227,8 @@ def user_languages():
 
 @socketio.on('update', namespace='/chat')
 def send_message(msg_evt):
+    """Send message to clients."""
+
     text = msg_evt['value']
     author_id = user().user_id
     timestamp = datetime.now()
@@ -246,6 +248,12 @@ def send_message(msg_evt):
 
     # Emit both the message and the translation.
     emit('response', json_response(new_message), broadcast=True)
+
+
+@socketio.on('typing', namespace='/chat')
+def is_typing(user_evt):
+    """Show user is typing."""
+    emit('status', {'value': user_evt['value']}, broadcast=True)
 
 
 if __name__ == '__main__':  # pragma: no cover
