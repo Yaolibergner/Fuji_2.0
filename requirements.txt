@@ -14,3 +14,4 @@ Flask_SocketIO
 python-engineio
 python-socketio
 Flask-bcrypt
+selenium

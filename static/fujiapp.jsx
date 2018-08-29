@@ -111,7 +111,6 @@ class MessageArea extends React.Component {
       .then(data => this.setState({ user: data["user"] }));
   }
 
-
   // to update this.state.value everytime something is typed before submit.
   handleOnChange(event) {
     this.setState({ value: event.target.value });
@@ -149,7 +148,7 @@ class MessageArea extends React.Component {
           <div style={{ padding: 10 }}>
             <Grid container spacing={8} alignItems="flex-end">
               <Grid item xs>
-                <Input
+                <Input id="textarea"
                   disableUnderline
                   fullWidth
                   placeholder="Say something..."
@@ -159,7 +158,7 @@ class MessageArea extends React.Component {
                 />
               </Grid>
               <Grid item>
-                <Button
+                <Button id="sendbutton"
                   disabled={this.state.value === ""}
                   onClick={this.handleOnClick}
                   variant="contained"
@@ -194,8 +193,8 @@ class Feed extends React.Component {
       // Use Spread to append msg_evt to the feed area.
       this.setState({ messages: [...this.state.messages, msg_evt] });
       // Clear out is typing after user sent message.
-      if (msg_evt['author_id'] === this.state.typing_user) {
-        this.setState({typing_user:""});
+      if (msg_evt["author_id"] === this.state.typing_user) {
+        this.setState({ typing_user: "" });
       }
     });
     fetch("/messages", { credentials: "include" })
@@ -205,18 +204,19 @@ class Feed extends React.Component {
       .then(response => response.json())
       .then(data =>
         this.setState({ language: data["language"], user: data["user"] })
-      );
+      ); 
 
-    let timeout; 
+    // setTimeout for istyping to update when user stop typing.
+    let timeout;
     socket.on("status", user_evt => {
       let user = this.state.user;
       // Use Spread to append msg_evt to the feed area.
       if (user_evt["value"] !== user) {
         this.setState({ typing_user: user_evt["value"] });
         clearTimeout(timeout);
-        timeout = setTimeout( () => {
+        timeout = setTimeout(() => {
           this.setState({ typing_user: "" });
-        }, 5000);
+        }, 5000); 
       }
     });
   }

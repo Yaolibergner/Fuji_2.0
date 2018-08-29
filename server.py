@@ -79,6 +79,7 @@ def register_form():
     return render_template("register.html", lang_option=lang_option)
 
 
+# Enable user upload files.
 def allowed_file(filename):
     """Allow user upload profile picture."""
 
@@ -142,7 +143,8 @@ def logininfo():
 
     user = User.query.filter_by(email=email).first()
     if not user:
-        flash("You are not a user yet. Please email to request login permission.")
+        flash("""You are not a user yet. Please email to request 
+              login permission.""")
         return redirect("/")
     hash_pw = user.password
     check_pw = bcrypt.check_password_hash(hash_pw, password)
