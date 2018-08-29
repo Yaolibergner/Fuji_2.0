@@ -238,39 +238,48 @@ class Feed extends React.Component {
     let typing_user = this.state.typing_user;
     // React for loop.
     let messageList = messages.map(function(message) {
-      let translationList = message.translations.map(function(translation) {
+      let translationList = message.translations.map(function(translation, index) {
         if (
           translation.language === userLanguage &&
           message.text !== translation.text
         ) {
-          return <span>{translation.text}</span>;
+          return <span key={`translationText${index}`}>{translation.text}</span>;
         }
       });
       if (message.author_id !== user) {
         return (
-          <p>
+          <div style={{marginTop: '16px', marginBottom: '16px', alignSelf: "flex-start"}}>
             <img
               src={"/uploads/" + message.author_id + ".jpg"}
-              style={{ weight: 50, height: 50, borderRadius: "50%" }}
+              style={{ marginLeft: "16px", marginRight: "16px", width: 50, height: 50, borderRadius: "50%" }}
             />
+           <Typography>
             {message.author}
+           </Typography>
             <br />
+           <Typography style={{backgroundColor: "#ededed", padding: "16px"}}>
             {message.text}
             <br />
             {translationList}
-          </p>
+           </Typography>
+          </div>
         );
       } else {
         return (
-          <p>
-            <img
-              src={"/uploads/" + message.author_id + ".jpg"}
-              style={{ weight: 50, height: 50, borderRadius: "50%" }}
-            />
-            {message.author}
-            <br />
-            {message.text}
-          </p>
+          <div style={{display: "flex", flexDirection: "column", marginTop: '16px', marginBottom: '16px', alignSelf: "flex-end"}}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
+             <Typography>
+              {message.author}
+             </Typography>
+              <img
+                src={"/uploads/" + message.author_id + ".jpg"}
+                style={{ marginLeft: "16px", marginRight: "16px", width: 50, height: 50, borderRadius: "50%" }}
+              />
+            </div>
+            <Typography style={{backgroundColor: "#ededed", padding: "16px"}}>
+              {message.text}
+             </Typography>
+          </div>
         );
       }
     });
@@ -279,27 +288,27 @@ class Feed extends React.Component {
       // set timeout function wrap the showing.
       // setTimeout(function())
       isTyping = (
-        <span>
+        <div>
           <img
             src={"/uploads/" + typing_user + ".jpg"}
             style={{ weight: 20, height: 20, borderRadius: "50%" }}
           />{" "}
           is typing...
-        </span>
+        </div>
       );
     }
     return (
-      <Typography>
         <div
-          style={{ margin: 10, paddingBottom: 100, marginTop: 75 }}
+          style={{ display: "flex", flexDirection: "column", margin: 10, paddingBottom: 100, marginTop: 75 }}
           ref={el => {
             this.el = el;
           }}
         >
           {messageList}
+         <Typography>
           <span> {isTyping} </span>
+         </Typography>
         </div>
-      </Typography>
     );
   }
 }

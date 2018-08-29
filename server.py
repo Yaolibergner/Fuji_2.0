@@ -53,7 +53,7 @@ def login_required(f):
     return decorated_function
 
 
-# Registration page protection. 
+# Registration page protection.
 def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -68,6 +68,17 @@ def request_access():
     """Show accessrequest page."""
 
     return render_template("accessrequest.html")
+
+
+# Add an invitation log in for registeration.
+# @app.route('/accessrequest', methods=['POST'])
+# def confirm_access():
+#     """Verify user access."""
+
+#     invite_code = request.form.get("invite_code")
+
+#     if invite_code == os.environ['']:
+#         return redirect("/register")
 
 
 @app.route('/register')
@@ -152,10 +163,13 @@ def logininfo():
     user = User.query.filter_by(email=email).first()
     # import pdb; pdb.set_trace()
     if not user:
-        return redirect("/register")
+        # return redirect("/register")
+
+        flash("""Not a user yet? This is an invitation only app! Please email 
+            below for registration permission. """)
 
     if not check_pw:
-        flash('Invalid password, please try again!')
+        flash("Invalid password, please try again!")
         return redirect("/")
 
     session["user_id"] = user.user_id
