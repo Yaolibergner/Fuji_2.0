@@ -15,6 +15,7 @@ from werkzeug.utils import secure_filename
 from flask import send_from_directory
 
 
+# https://flask-bcrypt.readthedocs.io/en/latest/
 UPLOAD_FOLDER = '/home/vagrant/src/_FUJI_2.0/uploads'
 ALLOWED_EXTENSIONS = set(['jpeg', 'jpg'])
 
@@ -52,7 +53,25 @@ def login_required(f):
     return decorated_function
 
 
+# Registration page protection. 
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if user() is None:
+            return redirect(url_for("request_access"))
+        return f(*args, **kwargs)
+    return decorated
+
+
+@app.route('/accessrequest')
+def request_access():
+    """Show accessrequest page."""
+
+    return render_template("accessrequest.html")
+
+
 @app.route('/register')
+@requires_auth
 def register_form():
     """Show form for user signup."""
 
@@ -253,6 +272,8 @@ def send_message(msg_evt):
 @socketio.on('typing', namespace='/chat')
 def is_typing(user_evt):
     """Show user is typing."""
+
+    # if user_evt['value'] != False:
     emit('status', {'value': user_evt['value']}, broadcast=True)
 
 

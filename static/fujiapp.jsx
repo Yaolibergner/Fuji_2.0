@@ -110,12 +110,25 @@ class MessageArea extends React.Component {
       .then(response => response.json())
       .then(data => this.setState({ user: data["user"] }));
   }
+
+  // // function to set timeout for stop showing user typing.
+  // timeoutFunction() {
+  //   let typing = false;
+  //   socekt.emit("typing", false);
+  // }
+
   // to update this.state.value everytime something is typed before submit.
   handleOnChange(event) {
     this.setState({ value: event.target.value });
-    // to send server that client is typing.
+    // // to send server that client is typing.
+    //   let typing = true;
+    //   let timeout;
     socket.emit("typing", { value: this.state.user });
+      // clear the previous timeout before setting a new one.
+      // clearTimeout(timeout);
+      // timeout = setTimeout(timeoutFunction, 5000);
   }
+
 
   // update textarea state, empty textarea once message is sent.
   handleOnClick(event) {
@@ -263,6 +276,8 @@ class Feed extends React.Component {
     });
     let isTyping = "";
     if (typing_user !== "") {
+      // set timeout function wrap the showing.
+      // setTimeout(function())
       isTyping = (
         <span>
           <img
