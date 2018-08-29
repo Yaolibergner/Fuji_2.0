@@ -111,24 +111,13 @@ class MessageArea extends React.Component {
       .then(data => this.setState({ user: data["user"] }));
   }
 
-  // // function to set timeout for stop showing user typing.
-  // timeoutFunction() {
-  //   let typing = false;
-  //   socekt.emit("typing", false);
-  // }
 
   // to update this.state.value everytime something is typed before submit.
   handleOnChange(event) {
     this.setState({ value: event.target.value });
     // // to send server that client is typing.
-    //   let typing = true;
-    //   let timeout;
     socket.emit("typing", { value: this.state.user });
-      // clear the previous timeout before setting a new one.
-      // clearTimeout(timeout);
-      // timeout = setTimeout(timeoutFunction, 5000);
   }
-
 
   // update textarea state, empty textarea once message is sent.
   handleOnClick(event) {
@@ -204,6 +193,10 @@ class Feed extends React.Component {
     socket.on("response", msg_evt => {
       // Use Spread to append msg_evt to the feed area.
       this.setState({ messages: [...this.state.messages, msg_evt] });
+      // Clear out is typing after user sent message.
+      if (msg_evt['author_id'] === this.state.typing_user) {
+        this.setState({typing_user:""});
+      }
     });
     fetch("/messages", { credentials: "include" })
       .then(response => response.json())
@@ -213,11 +206,17 @@ class Feed extends React.Component {
       .then(data =>
         this.setState({ language: data["language"], user: data["user"] })
       );
+
+    let timeout; 
     socket.on("status", user_evt => {
       let user = this.state.user;
       // Use Spread to append msg_evt to the feed area.
       if (user_evt["value"] !== user) {
         this.setState({ typing_user: user_evt["value"] });
+        clearTimeout(timeout);
+        timeout = setTimeout( () => {
+          this.setState({ typing_user: "" });
+        }, 5000);
       }
     });
   }
@@ -238,55 +237,86 @@ class Feed extends React.Component {
     let typing_user = this.state.typing_user;
     // React for loop.
     let messageList = messages.map(function(message) {
-      let translationList = message.translations.map(function(translation, index) {
+      let translationList = message.translations.map(function(
+        translation,
+        index
+      ) {
         if (
           translation.language === userLanguage &&
           message.text !== translation.text
         ) {
-          return <span key={`translationText${index}`}>{translation.text}</span>;
+          return (
+            <span key={`translationText${index}`}>{translation.text}</span>
+          );
         }
       });
       if (message.author_id !== user) {
         return (
-          <div style={{marginTop: '16px', marginBottom: '16px', alignSelf: "flex-start"}}>
+          <div
+            style={{
+              marginTop: "16px",
+              marginBottom: "16px",
+              alignSelf: "flex-start"
+            }}
+          >
             <img
               src={"/uploads/" + message.author_id + ".jpg"}
-              style={{ marginLeft: "16px", marginRight: "16px", width: 50, height: 50, borderRadius: "50%" }}
+              style={{
+                marginLeft: "16px",
+                marginRight: "16px",
+                width: 50,
+                height: 50,
+                borderRadius: "50%"
+              }}
             />
-           <Typography>
-            {message.author}
-           </Typography>
+            <Typography>{message.author}</Typography>
             <br />
-           <Typography style={{backgroundColor: "#ededed", padding: "16px"}}>
-            {message.text}
-            <br />
-            {translationList}
-           </Typography>
+            <Typography style={{ backgroundColor: "#ededed", padding: "16px" }}>
+              {message.text}
+              <br />
+              {translationList}
+            </Typography>
           </div>
         );
       } else {
         return (
-          <div style={{display: "flex", flexDirection: "column", marginTop: '16px', marginBottom: '16px', alignSelf: "flex-end"}}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end'}}>
-             <Typography>
-              {message.author}
-             </Typography>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              marginTop: "16px",
+              marginBottom: "16px",
+              alignSelf: "flex-end"
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "flex-end"
+              }}
+            >
+              <Typography>{message.author}</Typography>
               <img
                 src={"/uploads/" + message.author_id + ".jpg"}
-                style={{ marginLeft: "16px", marginRight: "16px", width: 50, height: 50, borderRadius: "50%" }}
+                style={{
+                  marginLeft: "16px",
+                  marginRight: "16px",
+                  width: 50,
+                  height: 50,
+                  borderRadius: "50%"
+                }}
               />
             </div>
-            <Typography style={{backgroundColor: "#ededed", padding: "16px"}}>
+            <Typography style={{ backgroundColor: "#ededed", padding: "16px" }}>
               {message.text}
-             </Typography>
+            </Typography>
           </div>
         );
       }
     });
     let isTyping = "";
     if (typing_user !== "") {
-      // set timeout function wrap the showing.
-      // setTimeout(function())
       isTyping = (
         <div>
           <img
@@ -298,17 +328,23 @@ class Feed extends React.Component {
       );
     }
     return (
-        <div
-          style={{ display: "flex", flexDirection: "column", margin: 10, paddingBottom: 100, marginTop: 75 }}
-          ref={el => {
-            this.el = el;
-          }}
-        >
-          {messageList}
-         <Typography>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          margin: 10,
+          paddingBottom: 100,
+          marginTop: 75
+        }}
+        ref={el => {
+          this.el = el;
+        }}
+      >
+        {messageList}
+        <Typography>
           <span> {isTyping} </span>
-         </Typography>
-        </div>
+        </Typography>
+      </div>
     );
   }
 }

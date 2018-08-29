@@ -58,27 +58,9 @@ def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if user() is None:
-            return redirect(url_for("request_access"))
+            return redirect(url_for("loginpage"))
         return f(*args, **kwargs)
     return decorated
-
-
-@app.route('/accessrequest')
-def request_access():
-    """Show accessrequest page."""
-
-    return render_template("accessrequest.html")
-
-
-# Add an invitation log in for registeration.
-# @app.route('/accessrequest', methods=['POST'])
-# def confirm_access():
-#     """Verify user access."""
-
-#     invite_code = request.form.get("invite_code")
-
-#     if invite_code == os.environ['']:
-#         return redirect("/register")
 
 
 @app.route('/register')
@@ -157,16 +139,13 @@ def logininfo():
 
     email = request.form.get("email")
     password = request.form.get("password")
-    hash_pw = bcrypt.generate_password_hash(password, 10).decode("utf-8")
-    check_pw = bcrypt.check_password_hash(hash_pw, password)
 
     user = User.query.filter_by(email=email).first()
-    # import pdb; pdb.set_trace()
     if not user:
-        # return redirect("/register")
-
-        flash("""Not a user yet? This is an invitation only app! Please email 
-            below for registration permission. """)
+        flash("You are not a user yet. Please email to request login permission.")
+        return redirect("/")
+    hash_pw = user.password
+    check_pw = bcrypt.check_password_hash(hash_pw, password)
 
     if not check_pw:
         flash("Invalid password, please try again!")
@@ -192,8 +171,6 @@ def feedpage():
 
 
 # Sqlachemy query response jsonifyable.
-
-
 def json_response(message):
     """Show query response in a json dict"""
     languages = db.session.query(User.language).distinct()
