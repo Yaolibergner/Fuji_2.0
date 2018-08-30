@@ -63,7 +63,9 @@ def requires_auth(f):
     return decorated
 
 
-@app.route('/register')
+# Changed register page to addmember. Only changed name for invitation only 
+# purpose for now. 
+@app.route('/addmember')
 @requires_auth
 def register_form():
     """Show form for user signup."""
@@ -76,7 +78,7 @@ def register_form():
                    "fi": "Finnish", "el": "Greek", "hi": "Hindi", "de": "German",
                    "ko": "Korean", "la": "Latin", "pl": "Polish", "pt": "Portuguese"}
 
-    return render_template("register.html", lang_option=lang_option)
+    return render_template("addmember.html", lang_option=lang_option)
 
 
 # Enable user upload files.
@@ -87,7 +89,9 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@app.route('/register', methods=['POST'])
+# Changed register page to addmember. Only changed name for invitation only 
+# purpose for now. 
+@app.route('/addmember', methods=['POST'])
 def add_user():
     """Process registration. Add registered user to database."""
 

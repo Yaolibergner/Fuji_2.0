@@ -59,9 +59,10 @@ const NavBar = () => {
         <Toolbar>
           <div style={{ flexGrow: 1 }}>
             <Typography variant="title" color="inherit">
-              Welcome to Fuji Chat!
+              Welcome to Bergner's family room!
             </Typography>
           </div>
+          <AddNewMember />
           <LogoutButton />
         </Toolbar>
       </AppBar>
@@ -89,6 +90,28 @@ class LogoutButton extends React.Component {
     );
   }
 }
+
+// Create a add a new member button.
+class AddNewMember extends React.Component {
+  handleClick(event) {
+    window.location.href = "/addmember";
+  }
+
+  render() {
+    return (
+      <div style={{ float: "right" }}>
+        <Button
+          onClick={this.handleClick}
+          variant="contained"
+          color="secondary"
+        >
+          Add New Member
+        </Button>
+      </div>
+    );
+  }
+}
+
 
 // MessageArea component that's a child of FujiApp root component
 class MessageArea extends React.Component {
