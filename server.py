@@ -274,7 +274,6 @@ def is_typing(user_evt):
     emit('status', {'value': user_evt['value']}, broadcast=True)
 
 
-
 if __name__ == '__main__':  # pragma: no cover
 
     is_testing = len(sys.argv) > 1 and sys.argv[1] == "testing" 

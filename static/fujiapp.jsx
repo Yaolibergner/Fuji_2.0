@@ -256,6 +256,7 @@ class Feed extends React.Component {
     this.scrollToBottom();
   }
 
+
   render() {
     let messages = this.state.messages;
     let userLanguage = this.state.language;
@@ -269,8 +270,6 @@ class Feed extends React.Component {
       ) {
         if (
           translation.language === userLanguage
-          // &&
-          // // message.text !== translation.text
         ) {
           return (
             <span key={`translationText${index}`}>{translation.text}</span>
