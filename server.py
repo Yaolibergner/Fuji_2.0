@@ -13,6 +13,7 @@ import os
 from flask_bcrypt import Bcrypt
 from werkzeug.utils import secure_filename
 from flask import send_from_directory
+import sys
 
 
 # https://flask-bcrypt.readthedocs.io/en/latest/
@@ -121,7 +122,7 @@ def add_user():
                     file.save(os.path.join(
                         app.config['UPLOAD_FOLDER'], filename))
 
-    return redirect("/")
+    return redirect("/feedpage")
 
 
 # http://flask.pocoo.org/docs/0.12/patterns/fileuploads/
@@ -193,7 +194,6 @@ def json_response(message):
         'translations': translation_dicts,
         'author': message.user.fname,
         'author_id': message.author_id
-        # 'timestamp': message.timestamp
     }
 
 
@@ -274,9 +274,27 @@ def is_typing(user_evt):
     emit('status', {'value': user_evt['value']}, broadcast=True)
 
 
+
 if __name__ == '__main__':  # pragma: no cover
 
-    app.debug = True
-    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-    connect_to_db(app)
-    socketio.run(app, host="0.0.0.0", debug=True)
+    is_testing = len(sys.argv) > 1 and sys.argv[1] == "testing" 
+    if not is_testing: 
+        app.debug = True
+        app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+        connect_to_db(app)
+        socketio.run(app, host="0.0.0.0", debug=True)
+    else:
+        print("THIS IS FOR TESTING!")
+        app.debug = True
+        app.config['UPLOAD_FOLDER'] = '/home/vagrant/src/_FUJI_2.0/uploads_test'
+        connect_to_db(app, "postgresql:///testdb")
+        db.drop_all()
+        db.create_all()
+        user_1 = User(email="yao@yao.com",
+                  password=bcrypt.generate_password_hash("123456", 10).decode("utf-8"),
+                  fname="Yao",
+                  lname="Li",
+                  language="en")
+        db.session.add(user_1)
+        db.session.commit()
+        socketio.run(app, host="0.0.0.0", debug=True)

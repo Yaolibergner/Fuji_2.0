@@ -79,7 +79,7 @@ class LogoutButton extends React.Component {
   render() {
     return (
       <div style={{ float: "right" }}>
-        <Button
+        <Button id="logout"
           onClick={this.handleClick}
           variant="contained"
           color="secondary"
@@ -100,7 +100,7 @@ class AddNewMember extends React.Component {
   render() {
     return (
       <div style={{ float: "right" }}>
-        <Button
+        <Button id="addmember"
           onClick={this.handleClick}
           variant="contained"
           color="secondary"
