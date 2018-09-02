@@ -79,7 +79,8 @@ class LogoutButton extends React.Component {
   render() {
     return (
       <div style={{ float: "right" }}>
-        <Button id="logout"
+        <Button
+          id="logout"
           onClick={this.handleClick}
           variant="contained"
           color="secondary"
@@ -99,8 +100,9 @@ class AddNewMember extends React.Component {
 
   render() {
     return (
-      <div style={{ float: "right" }}>
-        <Button id="addmember"
+      <div style={{ float: "right", marginRight: "15px" }}>
+        <Button
+          id="addmember"
           onClick={this.handleClick}
           variant="contained"
           color="secondary"
@@ -111,7 +113,6 @@ class AddNewMember extends React.Component {
     );
   }
 }
-
 
 // MessageArea component that's a child of FujiApp root component
 class MessageArea extends React.Component {
@@ -171,7 +172,8 @@ class MessageArea extends React.Component {
           <div style={{ padding: 10 }}>
             <Grid container spacing={8} alignItems="flex-end">
               <Grid item xs>
-                <Input id="textarea"
+                <Input
+                  id="textarea"
                   disableUnderline
                   fullWidth
                   placeholder="Say something..."
@@ -181,7 +183,8 @@ class MessageArea extends React.Component {
                 />
               </Grid>
               <Grid item>
-                <Button id="sendbutton"
+                <Button
+                  id="sendbutton"
                   disabled={this.state.value === ""}
                   onClick={this.handleOnClick}
                   variant="contained"
@@ -227,7 +230,7 @@ class Feed extends React.Component {
       .then(response => response.json())
       .then(data =>
         this.setState({ language: data["language"], user: data["user"] })
-      ); 
+      );
 
     // setTimeout for istyping to update when user stop typing.
     let timeout;
@@ -239,7 +242,7 @@ class Feed extends React.Component {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
           this.setState({ typing_user: "" });
-        }, 5000); 
+        }, 5000);
       }
     });
   }
@@ -277,28 +280,38 @@ class Feed extends React.Component {
         return (
           <div
             style={{
+              display: "flex",
               marginTop: "16px",
               marginBottom: "16px",
+              flexDirection: "column",
               alignSelf: "flex-start"
             }}
           >
-            <img
-              src={"/uploads/" + message.author_id + ".jpg"}
-              style={{
-                marginLeft: "16px",
-                marginRight: "16px",
-                width: 50,
-                height: 50,
-                borderRadius: "50%"
-              }}
-            />
             <Typography>{message.author}</Typography>
-            <br />
-            <Typography lasses={["messagetext"]} style={{ backgroundColor: "#ededed", padding: "16px" }}>
-              {message.text}
-              <br />
-              {translationList}
-            </Typography>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-start",
+                alignItems: "flex-start"
+              }}
+            >
+              <img
+                src={"/uploads/" + message.author_id + ".jpg"}
+                style={{
+                  marginRight: "16px",
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%"
+                }}
+              />
+              <Typography
+                style={{ backgroundColor: "#ededed", padding: "16px" }}
+              >
+                {message.text}
+                <br />
+                {translationList}
+              </Typography>
+            </div>
           </div>
         );
       } else {
@@ -316,24 +329,24 @@ class Feed extends React.Component {
               style={{
                 display: "flex",
                 justifyContent: "flex-end",
-                alignItems: "flex-end"
+                alignItems: "flex-start"
               }}
             >
-              <Typography>{message.author}</Typography>
+              <Typography
+                style={{ backgroundColor: "#ededed", padding: "16px" }}
+              >
+                {message.text}
+              </Typography>
               <img
                 src={"/uploads/" + message.author_id + ".jpg"}
                 style={{
                   marginLeft: "16px",
-                  marginRight: "16px",
-                  width: 50,
-                  height: 50,
+                  width: 40,
+                  height: 40,
                   borderRadius: "50%"
                 }}
               />
             </div>
-            <Typography classes={["messagetext"]} style={{ backgroundColor: "#ededed", padding: "16px" }}>
-              {message.text}
-            </Typography>
           </div>
         );
       }
