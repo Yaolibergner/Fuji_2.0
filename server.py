@@ -295,6 +295,8 @@ if __name__ == '__main__':  # pragma: no cover
                   fname="Yao",
                   lname="Li",
                   language="en")
+        chatroom_1 = Chatroom(chatroom_id = 1)
+        db.session.add(chatroom_1)
         db.session.add(user_1)
         db.session.commit()
         socketio.run(app, host="0.0.0.0", debug=True)

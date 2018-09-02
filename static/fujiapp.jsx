@@ -294,7 +294,7 @@ class Feed extends React.Component {
             />
             <Typography>{message.author}</Typography>
             <br />
-            <Typography style={{ backgroundColor: "#ededed", padding: "16px" }}>
+            <Typography lasses={["messagetext"]} style={{ backgroundColor: "#ededed", padding: "16px" }}>
               {message.text}
               <br />
               {translationList}
@@ -331,7 +331,7 @@ class Feed extends React.Component {
                 }}
               />
             </div>
-            <Typography style={{ backgroundColor: "#ededed", padding: "16px" }}>
+            <Typography classes={["messagetext"]} style={{ backgroundColor: "#ededed", padding: "16px" }}>
               {message.text}
             </Typography>
           </div>
