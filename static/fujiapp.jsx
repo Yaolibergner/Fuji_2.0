@@ -268,7 +268,7 @@ class Feed extends React.Component {
         index
       ) {
         if (
-          translation.language === userLanguage 
+          translation.language === userLanguage
           // &&
           // // message.text !== translation.text
         ) {
@@ -306,7 +306,11 @@ class Feed extends React.Component {
                 }}
               />
               <Typography
-                style={{ backgroundColor: "#ededed", padding: "8px", borderRadius: "1.2em" }}
+                style={{
+                  backgroundColor: "#ededed",
+                  padding: "8px",
+                  borderRadius: "1.2em"
+                }}
               >
                 {translationList}
               </Typography>
@@ -332,7 +336,11 @@ class Feed extends React.Component {
               }}
             >
               <Typography
-                style={{ backgroundColor: "#ededed", padding: "8px", borderRadius: "1.2em" }}
+                style={{
+                  backgroundColor: "#ededed",
+                  padding: "8px",
+                  borderRadius: "1.2em"
+                }}
               >
                 {message.text}
               </Typography>
