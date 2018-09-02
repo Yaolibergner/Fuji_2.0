@@ -59,7 +59,7 @@ const NavBar = () => {
         <Toolbar>
           <div style={{ flexGrow: 1 }}>
             <Typography variant="title" color="inherit">
-              Welcome to Bergner's family room!
+              Bergner's family room!
             </Typography>
           </div>
           <AddNewMember />
@@ -268,8 +268,9 @@ class Feed extends React.Component {
         index
       ) {
         if (
-          translation.language === userLanguage &&
-          message.text !== translation.text
+          translation.language === userLanguage 
+          // &&
+          // // message.text !== translation.text
         ) {
           return (
             <span key={`translationText${index}`}>{translation.text}</span>
@@ -281,8 +282,8 @@ class Feed extends React.Component {
           <div
             style={{
               display: "flex",
-              marginTop: "16px",
-              marginBottom: "16px",
+              marginTop: "8px",
+              marginBottom: "8px",
               flexDirection: "column",
               alignSelf: "flex-start"
             }}
@@ -298,17 +299,15 @@ class Feed extends React.Component {
               <img
                 src={"/uploads/" + message.author_id + ".jpg"}
                 style={{
-                  marginRight: "16px",
+                  marginRight: "8px",
                   width: 40,
                   height: 40,
                   borderRadius: "50%"
                 }}
               />
               <Typography
-                style={{ backgroundColor: "#ededed", padding: "16px" }}
+                style={{ backgroundColor: "#ededed", padding: "8px", borderRadius: "1.2em" }}
               >
-                {message.text}
-                <br />
                 {translationList}
               </Typography>
             </div>
@@ -320,8 +319,8 @@ class Feed extends React.Component {
             style={{
               display: "flex",
               flexDirection: "column",
-              marginTop: "16px",
-              marginBottom: "16px",
+              marginTop: "8px",
+              marginBottom: "8px",
               alignSelf: "flex-end"
             }}
           >
@@ -333,14 +332,14 @@ class Feed extends React.Component {
               }}
             >
               <Typography
-                style={{ backgroundColor: "#ededed", padding: "16px" }}
+                style={{ backgroundColor: "#ededed", padding: "8px", borderRadius: "1.2em" }}
               >
                 {message.text}
               </Typography>
               <img
                 src={"/uploads/" + message.author_id + ".jpg"}
                 style={{
-                  marginLeft: "16px",
+                  marginLeft: "8px",
                   width: 40,
                   height: 40,
                   borderRadius: "50%"
