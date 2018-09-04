@@ -52,13 +52,13 @@ body {
   position: relative;
 }
 .top_menu .buttons .button.close {
-  background-color: #f5886e;
+  background-color: #2196f3;
 }
 .top_menu .buttons .button.minimize {
-  background-color: #fdbf68;
+  background-color: #9adcfb;
 }
 .top_menu .buttons .button.maximize {
-  background-color: #a3d063;
+  background-color: #b2ebf2;
 }
 .top_menu .title {
   text-align: center;
