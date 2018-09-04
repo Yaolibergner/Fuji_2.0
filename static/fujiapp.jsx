@@ -23,7 +23,7 @@ const theme = createMuiTheme({
       main: "#F5F5F5"
     },
     secondary: {
-      main: "#FFCCBC"
+      main: "#2196f3"
     }
   }
 });
@@ -58,7 +58,7 @@ const NavBar = () => {
       <AppBar position="absolute">
         <Toolbar>
           <div style={{ flexGrow: 1 }}>
-            <Typography variant="title" color="inherit">
+            <Typography variant="title" color="grey">
               Bergner's family room!
             </Typography>
           </div>
@@ -83,7 +83,7 @@ class LogoutButton extends React.Component {
           id="logout"
           onClick={this.handleClick}
           variant="contained"
-          color="secondary"
+   
         >
           Logout
         </Button>
@@ -336,7 +336,8 @@ class Feed extends React.Component {
             >
               <Typography
                 style={{
-                  backgroundColor: "#ededed",
+                  backgroundColor: "#2196f3",
+                  color: "white",
                   padding: "8px",
                   borderRadius: "1.2em"
                 }}
@@ -370,8 +371,8 @@ class Feed extends React.Component {
       );
     }
     return (
-      <div
-        style={{
+      <div calss="texttesting"
+        style={{  
           display: "flex",
           flexDirection: "column",
           margin: 10,
