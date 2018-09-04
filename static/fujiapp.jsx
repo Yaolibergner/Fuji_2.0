@@ -83,7 +83,6 @@ class LogoutButton extends React.Component {
           id="logout"
           onClick={this.handleClick}
           variant="contained"
-   
         >
           Logout
         </Button>

@@ -30,7 +30,7 @@ body {
 }
 /*Added to customize the login page.*/
 .chat_window.login.register {
-    height: 700px;
+    height: 715px;
 }
 
 .top_menu {
@@ -55,7 +55,7 @@ body {
   background-color: #2196f3;
 }
 .top_menu .buttons .button.minimize {
-  background-color: #9adcfb;
+  background-color: #2196f3;
 }
 .top_menu .buttons .button.maximize {
   background-color: #b2ebf2;
@@ -224,4 +224,34 @@ body {
   display: none;
 }
 
+.login_button {
+  background-color:#2196f3;
+  border-radius: 10%;
+  color: white;
+  padding: 8px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 16px;
+  text-transform: uppercase;
+}
+
+.notuser {
+  margin-left: 16px
+}
+
+.submit_button {
+  background-color:#2196f3;
+  border-radius: 10%;
+  color: white;
+  padding: 8px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
 
