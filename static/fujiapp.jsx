@@ -79,11 +79,7 @@ class LogoutButton extends React.Component {
   render() {
     return (
       <div style={{ float: "right" }}>
-        <Button
-          id="logout"
-          onClick={this.handleClick}
-          variant="contained"
-        >
+        <Button id="logout" onClick={this.handleClick} variant="contained">
           Logout
         </Button>
       </div>
@@ -255,7 +251,6 @@ class Feed extends React.Component {
     this.scrollToBottom();
   }
 
-
   render() {
     let messages = this.state.messages;
     let userLanguage = this.state.language;
@@ -267,9 +262,7 @@ class Feed extends React.Component {
         translation,
         index
       ) {
-        if (
-          translation.language === userLanguage
-        ) {
+        if (translation.language === userLanguage) {
           return (
             <span key={`translationText${index}`}>{translation.text}</span>
           );
@@ -303,15 +296,31 @@ class Feed extends React.Component {
                   borderRadius: "50%"
                 }}
               />
-              <Typography
-                style={{
-                  backgroundColor: "#ededed",
-                  padding: "8px",
-                  borderRadius: "1.2em"
-                }}
-              >
-                {translationList}
-              </Typography>
+
+              <div class="hover">
+                <div class="hover__no-hover">
+                  <Typography
+                    style={{
+                      backgroundColor: "#ededed",
+                      padding: "8px",
+                      borderRadius: "1.2em"
+                    }}
+                  >
+                    {translationList}
+                  </Typography>
+                </div>
+                <div class="hover__hover">
+                  <Typography
+                    style={{
+                      backgroundColor: "#ededed",
+                      padding: "8px",
+                      borderRadius: "1.2em"
+                    }}
+                  >
+                    {message.text}
+                  </Typography>
+                </div>
+              </div>
             </div>
           </div>
         );
@@ -370,8 +379,9 @@ class Feed extends React.Component {
       );
     }
     return (
-      <div class="texttesting"
-        style={{  
+      <div
+        class="texttesting"
+        style={{
           display: "flex",
           flexDirection: "column",
           margin: 10,

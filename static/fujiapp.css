@@ -1,0 +1,18 @@
+.hover {
+  position: relative;
+}
+.hover:hover .hover__no-hover {
+    display: none;
+  }
+
+.hover:hover .hover__hover {
+    display: block;
+  }
+
+.hover__hover {
+    display: none;
+  }
+
+.hover__no-hover {
+    display: block;
+  }
