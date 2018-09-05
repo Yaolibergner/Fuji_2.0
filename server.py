@@ -289,10 +289,10 @@ if __name__ == '__main__':  # pragma: no cover
         connect_to_db(app, "postgresql:///testdb")
         db.drop_all()
         db.create_all()
-        user_1 = User(email="yao@yao.com",
-                  password=bcrypt.generate_password_hash("123456", 10).decode("utf-8"),
+        user_1 = User(email="cat@cat.com",
+                  password=bcrypt.generate_password_hash("12345678", 10).decode("utf-8"),
                   fname="Yao",
-                  lname="Li",
+                  lname="Fun",
                   language="en")
         chatroom_1 = Chatroom(chatroom_id = 1)
         db.session.add(chatroom_1)
