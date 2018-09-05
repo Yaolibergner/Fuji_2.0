@@ -370,7 +370,7 @@ class Feed extends React.Component {
       );
     }
     return (
-      <div calss="texttesting"
+      <div class="texttesting"
         style={{  
           display: "flex",
           flexDirection: "column",
