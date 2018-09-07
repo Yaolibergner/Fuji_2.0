@@ -296,7 +296,7 @@ if __name__ == '__main__':  # pragma: no cover
         db.session.commit()
         socketio.run(app, host="0.0.0.0", debug=True)
     elif is_production:
-        app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+        app.config['UPLOAD_FOLDER'] = '/home/ubuntu/Fuji_2.0/uploads'
         connect_to_db(app)
         socketio.run(app, host="0.0.0.0")
     else:
