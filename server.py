@@ -275,14 +275,10 @@ def is_typing(user_evt):
 
 
 if __name__ == '__main__':  # pragma: no cover
-
+    
+    is_production = len(sys.argv) > 1 and sys.argv[1] == "production"
     is_testing = len(sys.argv) > 1 and sys.argv[1] == "testing" 
-    if not is_testing: 
-        app.debug = True
-        app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-        connect_to_db(app)
-        socketio.run(app, host="0.0.0.0", debug=True)
-    else:
+    if is_testing: 
         print("THIS IS FOR TESTING!")
         app.debug = True
         app.config['UPLOAD_FOLDER'] = '/home/vagrant/src/_FUJI_2.0/uploads_test'
@@ -298,4 +294,13 @@ if __name__ == '__main__':  # pragma: no cover
         db.session.add(chatroom_1)
         db.session.add(user_1)
         db.session.commit()
+        socketio.run(app, host="0.0.0.0", debug=True)
+    elif is_production:
+        app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+        connect_to_db(app)
+        socketio.run(app, host="0.0.0.0")
+    else:
+        app.debug = True
+        app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+        connect_to_db(app)
         socketio.run(app, host="0.0.0.0", debug=True)

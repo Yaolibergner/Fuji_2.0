@@ -1,3 +1,6 @@
+/*https://stackoverflow.com/questions/29981236/how-do-you-hover-in-reactj
+-onmouseleave-not-registered-during-fast-hover-ove/35619979*/
+
 .hover {
   position: relative;
 }
